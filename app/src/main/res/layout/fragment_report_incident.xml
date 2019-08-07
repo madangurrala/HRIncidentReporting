@@ -1,51 +1,235 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.core.widget.NestedScrollView android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ReportIncident">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:layout_marginLeft="30dp"
+        tools:context=".ReportIncident">
 
-    <EditText
-        android:id="@+id/titleId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:enabled="false"
-        android:text="HR Incident Reporting"/>
+        <TextView
+            android:id="@+id/instructionId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="1"
+            android:text="Please enter the following details:" />
+        <TextView
+            android:id="@+id/noteId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/instructionId"
+            android:layout_weight="1"
+            android:text="(Note: Ignore the fields that are greyed out):"
+            android:textStyle="italic"/>
+        <TextView
+            android:id="@+id/titleLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/noteId"
+            android:layout_weight="1"
+            android:text="Title:" />
 
-    <EditText
-        android:id="@+id/incidentId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:layout_below="@+id/titleId"
-        android:enabled="false"
-        android:inputType="number"/>
+        <EditText
+            android:id="@+id/titleId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/titleLabel"
+            android:ems="10"
+            android:enabled="false"
+            android:text="HR Incident Reporting" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/labelEmpId"
-        android:layout_below="@+id/incidentId"
-        android:text=""/>
+        <TextView
+            android:id="@+id/labelIncidentId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/titleId"
+            android:layout_weight="1"
+            android:text="Incident ID:" />
 
-    <EditText
-        android:id="@+id/empId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:layout_below="@+id/labelEmpId"
-        android:hint="Enter Employee ID"/>
+        <EditText
+            android:id="@+id/incidentId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/labelIncidentId"
+            android:layout_marginTop="4dp"
+            android:ems="10"
+            android:enabled="false"
+            android:inputType="number" />
 
-    <EditText
-        android:id="@+id/dateId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="date"
-        android:layout_below="@+id/empId"
-        android:enabled="false"/>
+        <TextView
+            android:id="@+id/labelEmpId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/incidentId"
+            android:text="Employee ID:" />
 
 
-</RelativeLayout>
+        <EditText
+            android:id="@+id/empId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/labelEmpId"
+            android:layout_marginTop="-3dp"
+            android:ems="10"
+            android:hint="Enter Employee ID"
+            android:inputType="textPersonName" />
+
+        <TextView
+            android:id="@+id/labelEmpName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/empId"
+            android:text="Employee Name:" />
+
+
+        <EditText
+            android:id="@+id/empName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/labelEmpName"
+            android:layout_marginTop="-3dp"
+            android:ems="10"
+            android:enabled="false"
+            android:inputType="textPersonName" />
+
+        <TextView
+            android:id="@+id/labelDateId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/empName"
+            android:layout_weight="1"
+            android:text="Date:" />
+
+        <EditText
+            android:id="@+id/dateId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/labelDateId"
+            android:layout_marginTop="-3dp"
+            android:ems="10"
+            android:enabled="false"
+            android:inputType="date" />
+
+        <TextView
+            android:id="@+id/labelGenderId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/dateId"
+            android:layout_weight="1"
+            android:text="Gender" />
+
+        <RadioGroup
+            android:id="@+id/genderGroup"
+            android:layout_width="wrap_content"
+            android:layout_below="@+id/labelGenderId"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/femaleId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Male" />
+
+            <RadioButton
+                android:id="@+id/maleId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Female" />
+
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/labelShiftId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/genderGroup"
+            android:layout_weight="1"
+            android:text="Shift:" />
+
+        <Spinner
+            android:id="@+id/shiftId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/labelShiftId"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/labelDepartmentId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/shiftId"
+            android:layout_weight="1"
+            android:text="Department:" />
+
+        <EditText
+            android:id="@+id/departmentId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:layout_below="@+id/labelDepartmentId"
+            android:enabled="false"
+            android:inputType="textPersonName" />
+
+        <TextView
+            android:id="@+id/labelPositionId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/departmentId"
+            android:layout_weight="1"
+            android:text="Position:" />
+
+        <EditText
+            android:id="@+id/positionId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:layout_below="@+id/labelPositionId"
+            android:enabled="false"
+            android:inputType="textPersonName" />
+
+        <TextView
+            android:id="@+id/labelIncTypeId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/positionId"
+            android:layout_weight="1"
+            android:text="IncidentType:" />
+
+        <Spinner
+            android:id="@+id/incTypeId"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/labelIncTypeId"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/labelInjuredPartId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/incTypeId"
+            android:layout_weight="1"
+            android:text="Injured Body Part: " />
+
+        <Spinner
+            android:id="@+id/injuredPartId"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/labelInjuredPartId"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/buttonId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/injuredPartId"
+            android:text="Report Incident" />
+
+
+    </RelativeLayout>
+</androidx.core.widget.NestedScrollView>

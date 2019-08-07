@@ -9,9 +9,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import android.content.ClipData;
+import android.icu.text.CaseMap;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 
@@ -26,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        DataBaseHandler myDb = new DataBaseHandler(this);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         navBar = (NavigationView) findViewById(R.id.nav_view);
@@ -59,9 +65,10 @@ public class MainActivity extends AppCompatActivity {
 
         draw_layout.addDrawerListener(actionBar);
         actionBar.syncState();
+
     }
 
-    //When back button is pressed dwhen Nav bar is open, we don't want user to exit form the app
+    //When back button is pressed when Nav bar is open, we don't want user to exit form the app
     @Override
     public void onBackPressed() {
 
