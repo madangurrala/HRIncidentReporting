@@ -165,7 +165,7 @@ public class ReportIncident extends Fragment {
         final String bodyParts[] = new String[] {"Body_Part"};
         final int spinnerBParts[] = new int[] {android.R.id.text1};
 
-        Cursor cursor = myDb.selectBodyParts();
+        final Cursor cursor = myDb.selectBodyParts();
 
         final SimpleCursorAdapter adapterBodyParts = new SimpleCursorAdapter(view.getContext(),
                 android.R.layout.simple_spinner_dropdown_item, cursor, bodyParts, spinnerBParts);
@@ -177,8 +177,8 @@ public class ReportIncident extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
-                //Issue here;
-
+                cursor.moveToPosition(i);
+                injuredBdyStr =  cursor.getString(0);
 
             }
 
@@ -328,26 +328,6 @@ public class ReportIncident extends Fragment {
 
     }
 
-
-    public void getLastSavedData(){
-        final Cursor cursor = myDb.viewRecords();
-
-        while (cursor.moveToLast()){
-            message = "Incident Id:" + cursor.getString(0) +"\n";
-            message += "Title:" + cursor.getString(1)+"\n";
-            message += "Incident Date:"+cursor.getString(2)+"\n";
-            message += "Employee Number:"+cursor.getString(3)+"\n";
-            message += "Employee Name:"+cursor.getString(4)+"\n";
-            message += "Gender:"+cursor.getString(5)+"\n";
-            message += "Shift:"+cursor.getString(6)+"\n";
-            message += "Department:"+cursor.getString(7)+"\n";
-            message += "Position:"+cursor.getString(8)+"\n";
-            message += "Incident Type:"+cursor.getString(9)+"\n";
-            message += "Injured Body Part:"+cursor.getString(10)+"\n";
-        }
-        cursor.close();
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -370,7 +350,7 @@ public class ReportIncident extends Fragment {
 
             cursor.close();
 
-            String[] recipient = {"bhavikpatel7023@gmail.com, Bpatel4667@conestogac.on.ca"};
+            String[] recipient = {"madangurrala@gmail.com"};
 
             Intent emailIntent = new Intent(Intent.ACTION_SEND);
             emailIntent.putExtra(Intent.EXTRA_EMAIL, recipient );
@@ -378,16 +358,23 @@ public class ReportIncident extends Fragment {
             emailIntent.putExtra(Intent.EXTRA_TEXT, message);
             emailIntent.setType("application/image");
             emailIntent.putExtra(Intent.EXTRA_STREAM, image_uri);
-            startActivity(Intent.createChooser(emailIntent, "Choose app"));
+            try{
+                startActivity(Intent.createChooser(emailIntent, "Choose Email Client"));
+            }catch (Exception e){
+                Toast.makeText(getActivity(), "Oops!! There was a problem in sending email",
+                        Toast.LENGTH_LONG).show();
+            }
+
+            Toast.makeText(getActivity(), "Incident report has been emailed successfully",
+                    Toast.LENGTH_LONG).show();
+
         }else{
 
-            Toast.makeText(getActivity(), "Unfortunately Image can not be captured",
+            Toast.makeText(getActivity(), "Unfortunately Email could not be sent",
                     Toast.LENGTH_LONG).show();
 
         }
     }
-
-
 
     public boolean getEmployeeDetails(){
 
