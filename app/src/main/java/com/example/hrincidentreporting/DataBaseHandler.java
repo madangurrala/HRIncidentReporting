@@ -35,7 +35,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
-        sqLiteDatabase.execSQL("create table if not exists " + tableName +" (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+        sqLiteDatabase.execSQL("create table " + tableName +" (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "Title TEXT, IncidentDate NUMERIC, EmployeeNumber TEXT, EmployeeName TEXT, Gender TEXT, Shift TEXT, Department TEXT,Position TEXT, IncidentType TEXT, InjuredBodyPart TEXT);");
 
     }

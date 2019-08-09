@@ -1,20 +1,32 @@
 package com.example.hrincidentreporting;
-
+import android.Manifest;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.ScrollingTabContainerView;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,6 +40,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.text.SimpleDateFormat;
 
+import static android.app.Activity.RESULT_OK;
 
 public class ReportIncident extends Fragment {
 
@@ -37,27 +50,21 @@ public class ReportIncident extends Fragment {
     EditText title, incidentId, empId, empName, date, department, position;
     RadioGroup genderGroup;
     RadioButton male, female;
-    private Spinner shift, incidentType, InjBodyPart;
+    private Spinner shift, incidentType, injBodyPart;
     private Button submitButton;
+    private String message;
+    String bdyParts = " ";
+    Uri image_uri;
 
      private String[] shiftArray, incidentArray, bodyParts;
      private int[] spinnerBParts;
     DataBaseHandler myDb;
     View view;
-    String genderStr, shiftStr, incidentStr, injuredBdyStr;
+    String genderStr, shiftStr, incidentStr, injuredBdyStr, titleStr, incidentDateStr, empNumberStr,
+            dateStr, empNameStr,departmentStr, positionStr;
+    private static final int CAM_REQUEST = 101;
+    private static final int REQUEST_CODE = 1001;
 
-
-    public boolean validateId(){
-        /*This block of code checks if something is entered in ID field and then try to parses to int,
-        if not parsable sets an error to ID filed.*/
-            if(empId.getText().length() == 0){
-                empId.setError("Enter Employee ID");
-                return false;
-            }else {
-                empId.setError(null);
-                return true;
-            }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -93,7 +100,7 @@ public class ReportIncident extends Fragment {
 
         shift = (Spinner) view.findViewById(R.id.shiftId);
         incidentType = (Spinner) view.findViewById(R.id.incTypeId);
-        InjBodyPart = (Spinner) view.findViewById(R.id.injuredPartId);
+        injBodyPart = (Spinner) view.findViewById(R.id.injuredPartId);
 
         submitButton = (Button) view.findViewById(R.id.buttonId);
 
@@ -112,36 +119,128 @@ public class ReportIncident extends Fragment {
                 android.R.layout.simple_spinner_dropdown_item, incidentArray);
         incidentType.setAdapter(adptIncident);
 
-        String bodyParts[] = new String[] {"Body_Part"};
-        int spinnerBParts[] = new int[] {android.R.id.text1};
+        shift.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                shiftStr = shiftArray[position];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        empId.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+                getEmployeeDetails();
+
+            }
+        });
+
+        incidentType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                incidentStr = incidentArray[i];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        final String bodyParts[] = new String[] {"Body_Part"};
+        final int spinnerBParts[] = new int[] {android.R.id.text1};
 
         Cursor cursor = myDb.selectBodyParts();
 
-        SimpleCursorAdapter adapterBodyParts = new SimpleCursorAdapter(view.getContext(),
+        final SimpleCursorAdapter adapterBodyParts = new SimpleCursorAdapter(view.getContext(),
                 android.R.layout.simple_spinner_dropdown_item, cursor, bodyParts, spinnerBParts);
 
         adapterBodyParts.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        InjBodyPart.setAdapter(adapterBodyParts);
+        injBodyPart.setAdapter(adapterBodyParts);
+
+        injBodyPart.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                //Issue here;
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+
         reportIncident();
         return view;
     }
 
+    public boolean validateId(){
+        /*This block of code checks if something is entered in ID field and then try to parses to int,
+        if not parsable sets an error to ID filed.*/
+        try{
+            if(empId.getText().length() == 0){
+                empId.setError("Enter Employee ID");
+                return false;
+            }else {
+                empId.setError(null);
+                Integer.parseInt(empId.getText().toString());
+                return true;
+            }
+        }catch (NumberFormatException e){
+            empId.setError("Enter correct Employee ID");
+            return false;
+        }
+    }
+
     public boolean genderSelection(){
-        boolean ischecked = false;
         if(male.isChecked()){
             genderStr = male.getText().toString();
-            ischecked = true;
+            labelGender.setError(null);
+            return true;
         }
-        if(female.isChecked()){
+        else if(female.isChecked()){
             genderStr = female.getText().toString();
-            ischecked = true;
+            labelGender.setError(null);
+            return true;
+        }else{
+            labelGender.setError("Please select Gender");
+            return false;
         }
-        if(!male.isChecked() && !female.isChecked()){
+    }
 
-            ischecked = false;
+
+    public boolean validateAllFields(){
+
+        boolean[] methods = new boolean[3];
+        methods[0] = validateId();
+        methods[1] = genderSelection();
+        methods[2] = getEmployeeDetails();
+
+        for(int i=0; i<methods.length; i++){
+            if(methods[i] == false){
+                return false;
+            }
         }
-
-        return ischecked;
+        return true;
     }
 
     public void reportIncident(){
@@ -150,44 +249,162 @@ public class ReportIncident extends Fragment {
             @Override
             public void onClick(View view) {
 
-                String titleStr, incidentDateStr, empNumberStr, empNameStr, shiftStr, departmentStr,
-                        positionStr, incidentTypeStr, bodyPartStr;
                 titleStr = title.getText().toString();
                 incidentDateStr = date.getText().toString();
                 empNumberStr = empId.getText().toString();
+                empNameStr = empName.getText().toString();
+                dateStr = date.getText().toString();
+                departmentStr = department.getText().toString();
+                positionStr = position.getText().toString();
 
+                if(validateAllFields()) {
 
-                if(getEmployeeDetails()) {
+                    boolean createdRecord =myDb.insertRecord(titleStr,dateStr,empNumberStr,
+                            empNameStr, genderStr, shiftStr,departmentStr,positionStr,incidentStr,
+                            injuredBdyStr );
 
-                   /* boolean createdRecord =myDb.insertRecord()*/
+                    if(createdRecord){
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
 
+                            if(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) ==
+                                    PackageManager.PERMISSION_DENIED || ActivityCompat.checkSelfPermission(getActivity(),Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                                    PackageManager.PERMISSION_DENIED ){
 
+                                String[] permission = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE };
+                                requestPermissions(permission, REQUEST_CODE);
+                            }
+                            else{
 
+                                openCamera();
+
+                            }
+                        }else{
+                            openCamera();
+
+                        }
+                        Toast.makeText(getActivity(), "Inserted Data has been added to database",
+                                Toast.LENGTH_LONG).show();
+
+                    }else{
+                        Toast.makeText(getActivity(), "Unfortunately the data could not be entered",
+                                Toast.LENGTH_LONG).show();
+                    }
+                }else{
+                    Toast.makeText(getActivity(), "Please enter all the required fields",
+                            Toast.LENGTH_LONG ).show();
+                    return;
                 }
-
-                Toast.makeText(getActivity(), "Hello ", Toast.LENGTH_LONG ).show();
             }
+
         });
     }
+
+    private void openCamera(){
+
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "Picture");
+        image_uri = getActivity().getApplicationContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+        Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        camera.putExtra(MediaStore.EXTRA_OUTPUT, image_uri);
+        startActivityForResult(camera, CAM_REQUEST);
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        switch (requestCode){
+            case REQUEST_CODE:{
+                if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+                    openCamera();
+
+                }else{
+                    Toast.makeText(getActivity(), " Permission denied", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+
+    }
+
+
+    public void getLastSavedData(){
+        final Cursor cursor = myDb.viewRecords();
+
+        while (cursor.moveToLast()){
+            message = "Incident Id:" + cursor.getString(0) +"\n";
+            message += "Title:" + cursor.getString(1)+"\n";
+            message += "Incident Date:"+cursor.getString(2)+"\n";
+            message += "Employee Number:"+cursor.getString(3)+"\n";
+            message += "Employee Name:"+cursor.getString(4)+"\n";
+            message += "Gender:"+cursor.getString(5)+"\n";
+            message += "Shift:"+cursor.getString(6)+"\n";
+            message += "Department:"+cursor.getString(7)+"\n";
+            message += "Position:"+cursor.getString(8)+"\n";
+            message += "Incident Type:"+cursor.getString(9)+"\n";
+            message += "Injured Body Part:"+cursor.getString(10)+"\n";
+        }
+        cursor.close();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(resultCode == RESULT_OK ){
+
+            Cursor cursor = myDb.viewRecords();
+
+                cursor.moveToLast();
+                message = "Incident Id:" + cursor.getString(0) +"\n";
+                message += "Title:" + cursor.getString(1)+"\n";
+                message += "Incident Date:"+cursor.getString(2)+"\n";
+                message += "Employee Number:"+cursor.getString(3)+"\n";
+                message += "Employee Name:"+cursor.getString(4)+"\n";
+                message += "Gender:"+cursor.getString(5)+"\n";
+                message += "Shift:"+cursor.getString(6)+"\n";
+                message += "Department:"+cursor.getString(7)+"\n";
+                message += "Position:"+cursor.getString(8)+"\n";
+                message += "Incident Type:"+cursor.getString(9)+"\n";
+                message += "Injured Body Part:"+cursor.getString(10)+"\n";
+
+            cursor.close();
+
+            String[] recipient = {"bhavikpatel7023@gmail.com, Bpatel4667@conestogac.on.ca"};
+
+            Intent emailIntent = new Intent(Intent.ACTION_SEND);
+            emailIntent.putExtra(Intent.EXTRA_EMAIL, recipient );
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "HR Incident Reporting" );
+            emailIntent.putExtra(Intent.EXTRA_TEXT, message);
+            emailIntent.setType("application/image");
+            emailIntent.putExtra(Intent.EXTRA_STREAM, image_uri);
+            startActivity(Intent.createChooser(emailIntent, "Choose app"));
+        }else{
+
+            Toast.makeText(getActivity(), "Unfortunately Image can not be captured",
+                    Toast.LENGTH_LONG).show();
+
+        }
+    }
+
+
 
     public boolean getEmployeeDetails(){
 
         if(validateId()){
-            Cursor cursor =  myDb.viewEmployeeRecord(empId.getText().toString().trim());
+            Cursor response =  myDb.viewEmployeeRecord(empId.getText().toString().trim());
 
-            if(cursor.getCount() == 0){
+            if(response.getCount() == 0){
 
                 showData("Error", "Entered Employee ID doesn't exist");
                 return false;
             }else{
-                StringBuffer buffer = new StringBuffer();
-                //Passing all the Cursor records to Buffer using index
-                while (cursor.moveToNext()){
-                    empName.setText(cursor.getString(1));
-                    department.setText(cursor.getString(2));
-                    position.setText(cursor.getString(3));
+                while (response.moveToNext()){
+                    empName.setText(response.getString(1));
+                    department.setText(response.getString(2));
+                    position.setText(response.getString(3));
                 }
-                cursor.close();
+                response.close();
                 return true;
             }
         }else{
@@ -208,6 +425,5 @@ public class ReportIncident extends Fragment {
         alertBuilder.setMessage(message);
         alertBuilder.show();
     }
-
 
 }
