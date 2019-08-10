@@ -20,6 +20,7 @@ public class ViewIncidents extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment with the xml layout and stored in view object
         view =  inflater.inflate(R.layout.fragmetnt_view_incidents, container, false);
         display = (TextView) view.findViewById(R.id.displayIncidentsId);
 
@@ -27,14 +28,15 @@ public class ViewIncidents extends Fragment {
         // Inflate the layout for this fragment
         viewIncidents();
 
-
+        //returning the view object to Main activity
         return view;
     }
 
     public void viewIncidents(){
 
+        //retrieving all the stored incidents
         Cursor cursor = myDb.viewRecords();
-
+        //Displaying all the records in text view
         while (cursor.moveToNext()){
             display.append("Incident Id:" + cursor.getString(0) +"\n");
             display.append("Title:" + cursor.getString(1)+"\n");

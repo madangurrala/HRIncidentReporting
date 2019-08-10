@@ -21,49 +21,58 @@ import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
+    //Instantiating UI controls used in layout file
     private DrawerLayout draw_layout;
     Toolbar toolbar;
     NavigationView navBar;
 
-
+    //The main method which is called as soon as the App is launched
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         DataBaseHandler myDb = new DataBaseHandler(this);
-
+        //Associating UI control objects with referencing to their Ids in layout.xml file
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         navBar = (NavigationView) findViewById(R.id.nav_view);
+
+        //passing the toolbar to act as the action bar  for the main activity
         setSupportActionBar(toolbar);
 
         draw_layout = findViewById(R.id.drawer_layout);
 
+        //This method keep listening to the nav bar item selection
         navBar.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                //If any item on nav bar is selected it brings the fragment manager to call the respective fragment layout
                 switch(item.getItemId()){
+                        /*When report incident is selected on nav bar, it replaces the fragment layout of main activity with
+                    report incident fragment view*/
                         case R.id.report_id:
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                                new ReportIncident() ).commit();
                         break;
-
+                    //When report incident is selected on nav bar, it replaces the fragment layout of main activity with fragment view
                         case R.id.view_id:
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                                 new ViewIncidents() ).commit();
                         break;
                 }
 
+                //It closes the navigation drawer upon selecting item
                 draw_layout.closeDrawer(GravityCompat.START);
                 return true;
             }
         });
 
-        //To have a menu icon
+        //ActionBarDrawerToggle is created to sync with the state of toolbar
         ActionBarDrawerToggle actionBar = new ActionBarDrawerToggle(this, draw_layout, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-
+        //this keep listenes to the layout to see if nav bar is open or close
         draw_layout.addDrawerListener(actionBar);
+        //This methods syncs the state
         actionBar.syncState();
 
     }
